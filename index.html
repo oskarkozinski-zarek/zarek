@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#173f35" />
-  <meta name="zarek-version" content="5.0.0-20260901" />
+  <meta name="zarek-version" content="7.0.0-20260901" />
   <title>Żarek – Rezerwacje</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon-192.png" type="image/png" />
@@ -21,13 +21,14 @@
     .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.dow{font-size:12px;color:var(--muted);font-weight:700;text-align:center;padding:6px}
     .day{min-height:96px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;box-shadow:0 4px 14px rgba(23,63,53,.03);position:relative;overflow:hidden}.day.off{opacity:.45}.day.today{outline:2px solid var(--gold)}.num{font-size:13px;font-weight:800;margin-bottom:5px}
     .booking{font-size:11px;line-height:1.2;padding:5px 6px;border-radius:8px;margin-top:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.confirmed{background:var(--red)}.pending{background:var(--orange)}.cancelled{background:#969696;text-decoration:line-through}.completed{background:var(--green2)}
-    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}.stat small{color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:4px}
+    .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}.stat small{color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:4px}
     .section{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}.section h2{margin:0 0 10px;font-size:17px}
     .list{display:grid;gap:8px}.row{display:grid;grid-template-columns:1.2fr .8fr .7fr .7fr auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px}.row .muted{font-size:12px;color:var(--muted)}
     dialog{border:0;border-radius:18px;padding:0;max-width:620px;width:calc(100% - 24px);box-shadow:0 30px 80px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(0,0,0,.42)}.modal{padding:18px}.modal h2{margin:0 0 14px}.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}label{font-size:12px;font-weight:800;color:var(--muted)}input,select,textarea{width:100%;padding:11px;border:1px solid #d8d5ca;border-radius:10px;font:inherit;background:#fff}textarea{min-height:76px;resize:vertical}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
     .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;color:#fff}.empty{color:var(--muted);padding:8px 0}
-    .syncbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-4px 0 10px;font-size:12px;color:var(--muted)}.syncstate{font-weight:800}.auth-actions{display:flex;gap:8px;align-items:center}.auth-email{font-size:12px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.login-note{font-size:13px;color:var(--muted);line-height:1.4;margin-top:-4px}.error{color:#a52626;font-size:13px;font-weight:700;min-height:18px}.hidden{display:none!important}
-    @media(max-width:760px){.day{min-height:78px;padding:5px}.booking{font-size:9px}.summary{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr 1fr}.row .actions-inline{grid-column:1/-1}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar{align-items:stretch}.month{min-width:140px}.hide-sm{display:none}}
+    .syncbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-4px 0 10px;font-size:12px;color:var(--muted)}
+    .view-actions{display:flex;gap:8px}.year-grid{display:none;grid-template-columns:repeat(3,1fr);gap:12px}.year-grid.active{display:grid}.month-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:var(--shadow)}.month-card h3{margin:0 0 8px;text-align:center;font-size:15px;cursor:pointer}.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.mini-dow{font-size:9px;color:var(--muted);font-weight:800;text-align:center;padding:2px 0}.mini-day{aspect-ratio:1;border-radius:7px;display:grid;place-items:center;font-size:10px;font-weight:700;background:#f7f6f1;cursor:pointer;position:relative}.mini-day.off{visibility:hidden}.mini-day.today{outline:2px solid var(--gold)}.mini-day.confirmed{background:var(--red);color:#fff}.mini-day.pending{background:var(--orange);color:#fff}.mini-day.completed{background:var(--green2);color:#fff}.mini-day.multi:after{content:'•';position:absolute;right:2px;top:-1px;font-size:10px;color:#fff}.year-legend{display:none;gap:10px;flex-wrap:wrap;margin:8px 0 12px;font-size:11px;color:var(--muted)}.year-legend.active{display:flex}.legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:-1px}.syncstate{font-weight:800}.auth-actions{display:flex;gap:8px;align-items:center}.auth-email{font-size:12px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.login-note{font-size:13px;color:var(--muted);line-height:1.4;margin-top:-4px}.error{color:#a52626;font-size:13px;font-weight:700;min-height:18px}.hidden{display:none!important}
+    @media(max-width:760px){.day{min-height:78px;padding:5px}.booking{font-size:9px}.summary{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr 1fr}.row .actions-inline{grid-column:1/-1}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar{align-items:stretch}.month{min-width:140px}.hide-sm{display:none}.year-grid{grid-template-columns:repeat(2,1fr);gap:8px}.month-card{padding:7px}.mini-grid{gap:2px}.mini-day{font-size:9px}}
   </style>
 </head>
 <body>
@@ -41,15 +42,18 @@
 
   <div class="toolbar">
     <div class="nav"><button class="secondary" id="prevBtn">←</button><div class="month" id="monthLabel"></div><button class="secondary" id="nextBtn">→</button></div>
-    <button class="secondary" id="todayBtn">Dzisiaj</button>
+    <div class="view-actions"><button class="secondary" id="todayBtn">Dzisiaj</button><button class="secondary" id="viewBtn">Rok</button></div>
   </div>
 
+  <div class="year-legend" id="yearLegend"><span><i class="legend-dot confirmed"></i>Potwierdzona</span><span><i class="legend-dot pending"></i>Wstępna</span><span><i class="legend-dot completed"></i>Zakończona</span></div>
   <div class="grid" id="calendar"></div>
+  <div class="year-grid" id="yearCalendar"></div>
 
   <div class="summary">
     <div class="stat"><small>Rezerwacje</small><strong id="statBookings">0</strong></div>
     <div class="stat"><small>Zajęte dni</small><strong id="statDays">0</strong></div>
-    <div class="stat"><small>Przychód</small><strong id="statRevenue">0 zł</strong></div>
+    <div class="stat"><small id="statRevenueLabel">Przychód miesiąca</small><strong id="statRevenue">0 zł</strong></div>
+    <div class="stat"><small id="statTaxLabel">Podatek 8,5% miesiąca</small><strong id="statTax">0 zł</strong></div>
     <div class="stat"><small>Potwierdzone</small><strong id="statConfirmed">0</strong></div>
   </div>
 
@@ -99,7 +103,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, remove, get } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyACVhSUWGWtIpR5F918E7vIxnVRUA5vhds",
@@ -117,6 +121,7 @@ const bookingsRef = ref(db,'bookings');
 let currentUser = null;
 let firebaseReady = false;
 let stopBookingsListener = null;
+let viewMode = 'month';
 
 const PLN = new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',maximumFractionDigits:0});
 const monthNames=['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
@@ -127,6 +132,27 @@ let bookings = JSON.parse(localStorage.getItem('zarek_bookings')||'[]');
 const $=id=>document.getElementById(id);
 function cacheLocal(){localStorage.setItem('zarek_bookings',JSON.stringify(bookings));}
 function setSyncState(text){$('syncState').textContent=text;}
+async function dailyBackup(){
+  if(!currentUser) return;
+  const day=todayIso();
+  const backupRef=ref(db,'backups/'+day);
+  const existing=await get(backupRef);
+  if(!existing.exists()){
+    const live=await get(bookingsRef);
+    await set(backupRef,{createdAt:new Date().toISOString(),bookings:live.val()||{}});
+  }
+  const backupsSnap=await get(ref(db,'backups'));
+  if(backupsSnap.exists()){
+    const cutoff=parseDate(day); cutoff.setDate(cutoff.getDate()-30);
+    const cutoffIso=iso(cutoff);
+    const removals=[];
+    for(const key of Object.keys(backupsSnap.val()||{})){
+      if(/^\d{4}-\d{2}-\d{2}$/.test(key) && key<cutoffIso) removals.push(remove(ref(db,'backups/'+key)));
+    }
+    if(removals.length) await Promise.all(removals);
+  }
+}
+
 function firebaseErrorMessage(err){
   const code=err?.code||'';
   if(code==='auth/invalid-credential'||code==='auth/wrong-password'||code==='auth/user-not-found') return 'Nieprawidłowy e-mail lub hasło.';
@@ -153,7 +179,53 @@ function totalFor(b){if(b.total!==''&&b.total!=null&&!Number.isNaN(Number(b.tota
 function overlapsDay(b,ds){return b.status!=='cancelled' && b.from<=ds && b.to>ds}
 function overlapsMonth(b,y,m){const start=`${y}-${String(m+1).padStart(2,'0')}-01`; const end=new Date(y,m+1,1); const endIso=iso(end); return b.from<endIso && b.to>start}
 function statusText(s){return {confirmed:'Potwierdzona',pending:'Wstępna',completed:'Zakończona',cancelled:'Anulowana'}[s]||s}
+function statusForDay(ds){
+  const dayBookings=bookings.filter(b=>overlapsDay(b,ds));
+  if(!dayBookings.length)return {status:'',count:0};
+  if(dayBookings.some(b=>b.status==='confirmed'))return {status:'confirmed',count:dayBookings.length};
+  if(dayBookings.some(b=>b.status==='pending'))return {status:'pending',count:dayBookings.length};
+  if(dayBookings.some(b=>b.status==='completed'))return {status:'completed',count:dayBookings.length};
+  return {status:'',count:dayBookings.length};
+}
+function renderYear(){
+  const y=view.getFullYear();
+  $('monthLabel').textContent=String(y);
+  $('calendar').style.display='none';
+  $('yearCalendar').classList.add('active');
+  $('yearLegend').classList.add('active');
+  $('viewBtn').textContent='Miesiąc';
+  const yc=$('yearCalendar');yc.innerHTML='';
+  for(let m=0;m<12;m++){
+    const card=document.createElement('div');card.className='month-card';
+    const title=document.createElement('h3');title.textContent=monthNames[m][0].toUpperCase()+monthNames[m].slice(1);
+    title.onclick=()=>{view.setMonth(m);viewMode='month';render()};card.appendChild(title);
+    const mg=document.createElement('div');mg.className='mini-grid';
+    dow.forEach(x=>{const e=document.createElement('div');e.className='mini-dow';e.textContent=x[0];mg.appendChild(e)});
+    const first=(new Date(y,m,1).getDay()+6)%7;
+    for(let i=0;i<first;i++){const e=document.createElement('div');e.className='mini-day off';mg.appendChild(e)}
+    const days=new Date(y,m+1,0).getDate();
+    for(let d=1;d<=days;d++){
+      const dt=new Date(y,m,d),ds=iso(dt),info=statusForDay(ds);const e=document.createElement('div');
+      e.className='mini-day'+(todayIso()===ds?' today':'')+(info.status?' '+info.status:'')+(info.count>1?' multi':'');e.textContent=d;
+      e.title=info.count?`${info.count} rezerwacji`:'Brak rezerwacji';
+      e.onclick=()=>{view=new Date(y,m,1);viewMode='month';render()};mg.appendChild(e);
+    }
+    card.appendChild(mg);yc.appendChild(card);
+  }
+  const inYear=bookings.filter(b=>b.from<`${y+1}-01-01`&&b.to>`${y}-01-01`);
+  $('statBookings').textContent=inYear.filter(b=>b.status!=='cancelled').length;
+  $('statConfirmed').textContent=inYear.filter(b=>b.status==='confirmed').length;
+  const yearRevenue=inYear.filter(b=>b.status!=='cancelled').reduce((sum,b)=>sum+totalFor(b),0);
+  $('statRevenueLabel').textContent='Przychód roczny';
+  $('statRevenue').textContent=PLN.format(yearRevenue);
+  $('statTaxLabel').textContent='Podatek 8,5% roku';
+  $('statTax').textContent=PLN.format(yearRevenue*0.085);
+  let occupied=0;for(let m=0;m<12;m++){for(let d=new Date(y,m,1);d<new Date(y,m+1,1);d.setDate(d.getDate()+1)){if(bookings.some(b=>overlapsDay(b,iso(d))))occupied++}}$('statDays').textContent=occupied;
+  const list=$('bookingList');list.innerHTML='<div class="empty">Widok roczny — wybierz miesiąc, aby zobaczyć listę rezerwacji.</div>';
+}
 function render(){
+  if(viewMode==='year'){renderYear();return;}
+  $('calendar').style.display='grid';$('yearCalendar').classList.remove('active');$('yearLegend').classList.remove('active');$('viewBtn').textContent='Rok';
   const y=view.getFullYear(), m=view.getMonth(); $('monthLabel').textContent=`${monthNames[m][0].toUpperCase()+monthNames[m].slice(1)} ${y}`;
   const cal=$('calendar'); cal.innerHTML=''; dow.forEach(x=>{const e=document.createElement('div');e.className='dow';e.textContent=x;cal.appendChild(e)});
   const first=(new Date(y,m,1).getDay()+6)%7; const start=new Date(y,m,1-first);
@@ -168,7 +240,11 @@ function render(){
   const inMonth=bookings.filter(b=>overlapsMonth(b,y,m));
   $('statBookings').textContent=inMonth.filter(b=>b.status!=='cancelled').length;
   $('statConfirmed').textContent=inMonth.filter(b=>b.status==='confirmed').length;
-  $('statRevenue').textContent=PLN.format(inMonth.filter(b=>b.status!=='cancelled').reduce((s,b)=>s+totalFor(b),0));
+  const monthRevenue=inMonth.filter(b=>b.status!=='cancelled').reduce((s,b)=>s+totalFor(b),0);
+  $('statRevenueLabel').textContent='Przychód miesiąca';
+  $('statRevenue').textContent=PLN.format(monthRevenue);
+  $('statTaxLabel').textContent='Podatek 8,5% miesiąca';
+  $('statTax').textContent=PLN.format(monthRevenue*0.085);
   let occupied=0; const monthStart=new Date(y,m,1), monthEnd=new Date(y,m+1,1); for(let d=new Date(monthStart);d<monthEnd;d.setDate(d.getDate()+1)){if(bookings.some(b=>overlapsDay(b,iso(d))))occupied++} $('statDays').textContent=occupied;
   const list=$('bookingList'); list.innerHTML=''; const sorted=[...inMonth].sort((a,b)=>a.from.localeCompare(b.from)); if(!sorted.length){list.innerHTML='<div class="empty">Brak rezerwacji w tym miesiącu.</div>'} else sorted.forEach(b=>{
     const r=document.createElement('div');r.className='row';r.innerHTML=`<div><strong>${escapeHtml(b.guest)}</strong><div class="muted">${escapeHtml(b.room||'Bez nazwy')}</div></div><div>${b.from}<div class="muted">do ${b.to}</div></div><div><span class="badge ${b.status}">${statusText(b.status)}</span></div><div><strong>${PLN.format(totalFor(b))}</strong></div><div class="actions-inline"><button class="secondary">Edytuj</button></div>`; r.querySelector('button').onclick=()=>openEdit(b.id); list.appendChild(r)
@@ -180,7 +256,7 @@ function openNew(ds){resetForm();$('modalTitle').textContent='Dodaj rezerwację'
 function openEdit(id){const b=bookings.find(x=>x.id===id); if(!b)return; resetForm(); $('modalTitle').textContent='Edytuj rezerwację'; $('bookingId').value=b.id;$('guest').value=b.guest;$('phone').value=b.phone||'';$('room').value=b.room||'';$('dateFrom').value=b.from;$('dateTo').value=b.to;$('price').value=b.price??350;$('extra').value=b.extra??0;$('status').value=b.status;$('notes').value=b.notes||'';$('total').value=b.total??totalFor(b);$('deleteBtn').style.display='inline-block';$('dialog').showModal();}
 $('bookingForm').addEventListener('submit',async e=>{e.preventDefault();const from=$('dateFrom').value,to=$('dateTo').value;if(!from||!to||to<=from){alert('Data „do” musi być późniejsza niż data „od”.');return}const id=$('bookingId').value||crypto.randomUUID();const b={id,guest:$('guest').value.trim(),phone:$('phone').value.trim(),room:$('room').value.trim(),from,to,price:Number($('price').value||0),extra:Number($('extra').value||0),status:$('status').value,total:$('total').value===''?'':Number($('total').value),notes:$('notes').value.trim()};const before=[...bookings];const i=bookings.findIndex(x=>x.id===id); if(i>=0)bookings[i]=b;else bookings.push(b);cacheLocal();render();$('dialog').close();try{await saveBooking(b)}catch(err){bookings=before;cacheLocal();render();setSyncState('Firebase: błąd zapisu');alert(firebaseErrorMessage(err));}});
 $('deleteBtn').onclick=async()=>{const id=$('bookingId').value;if(id&&confirm('Usunąć tę rezerwację?')){const before=[...bookings];bookings=bookings.filter(x=>x.id!==id);cacheLocal();render();$('dialog').close();try{await deleteBookingRemote(id)}catch(err){bookings=before;cacheLocal();render();setSyncState('Firebase: błąd usuwania');alert(firebaseErrorMessage(err));}}};
-$('cancelBtn').onclick=()=>$('dialog').close();$('addBtn').onclick=()=>{if(currentUser)openNew();else $('loginDialog').showModal()};$('prevBtn').onclick=()=>{view.setMonth(view.getMonth()-1);render()};$('nextBtn').onclick=()=>{view.setMonth(view.getMonth()+1);render()};$('todayBtn').onclick=()=>{view=parseDate(todayIso());view.setDate(1);render()};
+$('cancelBtn').onclick=()=>$('dialog').close();$('addBtn').onclick=()=>{if(currentUser)openNew();else $('loginDialog').showModal()};$('prevBtn').onclick=()=>{if(viewMode==='year')view.setFullYear(view.getFullYear()-1);else view.setMonth(view.getMonth()-1);render()};$('nextBtn').onclick=()=>{if(viewMode==='year')view.setFullYear(view.getFullYear()+1);else view.setMonth(view.getMonth()+1);render()};$('todayBtn').onclick=()=>{view=parseDate(todayIso());view.setDate(1);render()};$('viewBtn').onclick=()=>{viewMode=viewMode==='month'?'year':'month';render()};
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';$('loginBtn').disabled=true;try{await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value)}catch(err){$('loginError').textContent=firebaseErrorMessage(err)}finally{$('loginBtn').disabled=false}});
 $('logoutBtn').onclick=()=>signOut(auth);
 
@@ -214,10 +290,11 @@ onAuthStateChanged(auth,user=>{
     } else firstSnapshot=false;
     bookings=Object.values(remote);
     cacheLocal();firebaseReady=true;setSyncState('Firebase: zsynchronizowano');render();
+    dailyBackup().catch(err=>console.warn('Backup:',err));
   },err=>{firebaseReady=false;setSyncState('Firebase: brak dostępu');alert(firebaseErrorMessage(err));});
 });
 
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=5').catch(()=>{});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=9').catch(()=>{});
 render();
 </script>
 </body>
