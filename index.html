@@ -87,7 +87,7 @@ let view = new Date(); view.setDate(1);
 let bookings = JSON.parse(localStorage.getItem('zarek_bookings')||'[]');
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem('zarek_bookings',JSON.stringify(bookings)); render();}
-function iso(d){return d.toISOString().slice(0,10)}
+function iso(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
 function parseDate(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
 function daysBetween(a,b){return Math.max(1,Math.round((parseDate(b)-parseDate(a))/86400000))}
 function totalFor(b){if(b.total!==''&&b.total!=null&&!Number.isNaN(Number(b.total)))return Number(b.total); return daysBetween(b.from,b.to)*Number(b.price||0)+Number(b.extra||0)}
