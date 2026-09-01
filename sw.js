@@ -1,4 +1,4 @@
-const CACHE='zarek-v4-20260901';
+const CACHE='zarek-v5-20260901-firebase';
 const ASSETS=['./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 
 self.addEventListener('install',event=>{

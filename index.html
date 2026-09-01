@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#173f35" />
-  <meta name="zarek-version" content="4.0.0-20260901" />
+  <meta name="zarek-version" content="5.0.0-20260901" />
   <title>Żarek – Rezerwacje</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon-192.png" type="image/png" />
@@ -26,6 +26,7 @@
     .list{display:grid;gap:8px}.row{display:grid;grid-template-columns:1.2fr .8fr .7fr .7fr auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px}.row .muted{font-size:12px;color:var(--muted)}
     dialog{border:0;border-radius:18px;padding:0;max-width:620px;width:calc(100% - 24px);box-shadow:0 30px 80px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(0,0,0,.42)}.modal{padding:18px}.modal h2{margin:0 0 14px}.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}label{font-size:12px;font-weight:800;color:var(--muted)}input,select,textarea{width:100%;padding:11px;border:1px solid #d8d5ca;border-radius:10px;font:inherit;background:#fff}textarea{min-height:76px;resize:vertical}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
     .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;color:#fff}.empty{color:var(--muted);padding:8px 0}
+    .syncbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-4px 0 10px;font-size:12px;color:var(--muted)}.syncstate{font-weight:800}.auth-actions{display:flex;gap:8px;align-items:center}.auth-email{font-size:12px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.login-note{font-size:13px;color:var(--muted);line-height:1.4;margin-top:-4px}.error{color:#a52626;font-size:13px;font-weight:700;min-height:18px}.hidden{display:none!important}
     @media(max-width:760px){.day{min-height:78px;padding:5px}.booking{font-size:9px}.summary{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr 1fr}.row .actions-inline{grid-column:1/-1}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar{align-items:stretch}.month{min-width:140px}.hide-sm{display:none}}
   </style>
 </head>
@@ -33,8 +34,10 @@
 <div class="app">
   <header>
     <div class="brand"><div class="logo">Ż</div><div><h1>Żarek</h1><div class="sub">Kalendarz rezerwacji</div></div></div>
-    <button class="primary" id="addBtn">+ Dodaj rezerwację</button>
+    <div class="auth-actions"><span class="auth-email" id="authEmail"></span><button class="secondary hidden" id="logoutBtn">Wyloguj</button><button class="primary" id="addBtn">+ Dodaj rezerwację</button></div>
   </header>
+
+  <div class="syncbar"><span id="syncState" class="syncstate">Firebase: oczekiwanie na logowanie</span></div>
 
   <div class="toolbar">
     <div class="nav"><button class="secondary" id="prevBtn">←</button><div class="month" id="monthLabel"></div><button class="secondary" id="nextBtn">→</button></div>
@@ -55,6 +58,19 @@
     <div class="list" id="bookingList"></div>
   </div>
 </div>
+
+<dialog id="loginDialog">
+  <form class="modal" id="loginForm">
+    <h2>Logowanie do Żarka</h2>
+    <p class="login-note">Zaloguj się wspólnym kontem Firebase. Po zalogowaniu rezerwacje będą synchronizowane między telefonami.</p>
+    <div class="form">
+      <div class="field full"><label>E-mail</label><input id="loginEmail" type="email" autocomplete="username" required /></div>
+      <div class="field full"><label>Hasło</label><input id="loginPassword" type="password" autocomplete="current-password" required /></div>
+      <div class="field full"><div id="loginError" class="error"></div></div>
+    </div>
+    <div class="actions"><button type="submit" class="primary" id="loginBtn">Zaloguj</button></div>
+  </form>
+</dialog>
 
 <dialog id="dialog">
   <form method="dialog" class="modal" id="bookingForm">
@@ -80,7 +96,28 @@
   </form>
 </dialog>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyACVhSUWGWtIpR5F918E7vIxnVRUA5vhds",
+  authDomain: "zarek-39a9b.firebaseapp.com",
+  databaseURL: "https://zarek-39a9b-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "zarek-39a9b",
+  storageBucket: "zarek-39a9b.firebasestorage.app",
+  messagingSenderId: "404203193",
+  appId: "1:404203193:web:fc0b74c5ed502c3e609d68"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getDatabase(firebaseApp);
+const bookingsRef = ref(db,'bookings');
+let currentUser = null;
+let firebaseReady = false;
+let stopBookingsListener = null;
+
 const PLN = new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',maximumFractionDigits:0});
 const monthNames=['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
 const dow=['Pon','Wt','Śr','Czw','Pt','Sob','Ndz'];
@@ -88,7 +125,26 @@ function todayIso(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/War
 let view = parseDate(todayIso()); view.setDate(1);
 let bookings = JSON.parse(localStorage.getItem('zarek_bookings')||'[]');
 const $=id=>document.getElementById(id);
-function save(){localStorage.setItem('zarek_bookings',JSON.stringify(bookings)); render();}
+function cacheLocal(){localStorage.setItem('zarek_bookings',JSON.stringify(bookings));}
+function setSyncState(text){$('syncState').textContent=text;}
+function firebaseErrorMessage(err){
+  const code=err?.code||'';
+  if(code==='auth/invalid-credential'||code==='auth/wrong-password'||code==='auth/user-not-found') return 'Nieprawidłowy e-mail lub hasło.';
+  if(code==='auth/too-many-requests') return 'Za dużo prób logowania. Spróbuj ponownie później.';
+  if(code==='auth/network-request-failed') return 'Brak połączenia z internetem.';
+  return 'Błąd Firebase: '+(code||err?.message||'nieznany');
+}
+async function saveBooking(b){
+  if(!currentUser){$('loginDialog').showModal();return;}
+  setSyncState('Firebase: zapisywanie…');
+  await set(ref(db,'bookings/'+b.id),b);
+}
+async function deleteBookingRemote(id){
+  if(!currentUser){$('loginDialog').showModal();return;}
+  setSyncState('Firebase: usuwanie…');
+  await remove(ref(db,'bookings/'+id));
+}
+
 function iso(d){const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
 function dateSerial(s){const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)}
 function parseDate(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
@@ -122,10 +178,46 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':
 function resetForm(){['bookingId','guest','phone','room','dateFrom','dateTo','notes','total'].forEach(id=>$(id).value='');$('price').value=350;$('extra').value=0;$('status').value='confirmed';$('deleteBtn').style.display='none'}
 function openNew(ds){resetForm();$('modalTitle').textContent='Dodaj rezerwację'; if(ds){$('dateFrom').value=ds; const d=parseDate(ds);d.setDate(d.getDate()+1);$('dateTo').value=iso(d)} $('dialog').showModal();}
 function openEdit(id){const b=bookings.find(x=>x.id===id); if(!b)return; resetForm(); $('modalTitle').textContent='Edytuj rezerwację'; $('bookingId').value=b.id;$('guest').value=b.guest;$('phone').value=b.phone||'';$('room').value=b.room||'';$('dateFrom').value=b.from;$('dateTo').value=b.to;$('price').value=b.price??350;$('extra').value=b.extra??0;$('status').value=b.status;$('notes').value=b.notes||'';$('total').value=b.total??totalFor(b);$('deleteBtn').style.display='inline-block';$('dialog').showModal();}
-$('bookingForm').addEventListener('submit',e=>{e.preventDefault();const from=$('dateFrom').value,to=$('dateTo').value;if(!from||!to||to<=from){alert('Data „do” musi być późniejsza niż data „od”.');return}const id=$('bookingId').value||crypto.randomUUID();const b={id,guest:$('guest').value.trim(),phone:$('phone').value.trim(),room:$('room').value.trim(),from,to,price:Number($('price').value||0),extra:Number($('extra').value||0),status:$('status').value,total:$('total').value===''?'':Number($('total').value),notes:$('notes').value.trim()};const i=bookings.findIndex(x=>x.id===id); if(i>=0)bookings[i]=b;else bookings.push(b);$('dialog').close();save();});
-$('deleteBtn').onclick=()=>{const id=$('bookingId').value;if(id&&confirm('Usunąć tę rezerwację?')){bookings=bookings.filter(x=>x.id!==id);$('dialog').close();save()}};
-$('cancelBtn').onclick=()=>$('dialog').close();$('addBtn').onclick=()=>openNew();$('prevBtn').onclick=()=>{view.setMonth(view.getMonth()-1);render()};$('nextBtn').onclick=()=>{view.setMonth(view.getMonth()+1);render()};$('todayBtn').onclick=()=>{view=parseDate(todayIso());view.setDate(1);render()};
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=4').catch(()=>{});
+$('bookingForm').addEventListener('submit',async e=>{e.preventDefault();const from=$('dateFrom').value,to=$('dateTo').value;if(!from||!to||to<=from){alert('Data „do” musi być późniejsza niż data „od”.');return}const id=$('bookingId').value||crypto.randomUUID();const b={id,guest:$('guest').value.trim(),phone:$('phone').value.trim(),room:$('room').value.trim(),from,to,price:Number($('price').value||0),extra:Number($('extra').value||0),status:$('status').value,total:$('total').value===''?'':Number($('total').value),notes:$('notes').value.trim()};const before=[...bookings];const i=bookings.findIndex(x=>x.id===id); if(i>=0)bookings[i]=b;else bookings.push(b);cacheLocal();render();$('dialog').close();try{await saveBooking(b)}catch(err){bookings=before;cacheLocal();render();setSyncState('Firebase: błąd zapisu');alert(firebaseErrorMessage(err));}});
+$('deleteBtn').onclick=async()=>{const id=$('bookingId').value;if(id&&confirm('Usunąć tę rezerwację?')){const before=[...bookings];bookings=bookings.filter(x=>x.id!==id);cacheLocal();render();$('dialog').close();try{await deleteBookingRemote(id)}catch(err){bookings=before;cacheLocal();render();setSyncState('Firebase: błąd usuwania');alert(firebaseErrorMessage(err));}}};
+$('cancelBtn').onclick=()=>$('dialog').close();$('addBtn').onclick=()=>{if(currentUser)openNew();else $('loginDialog').showModal()};$('prevBtn').onclick=()=>{view.setMonth(view.getMonth()-1);render()};$('nextBtn').onclick=()=>{view.setMonth(view.getMonth()+1);render()};$('todayBtn').onclick=()=>{view=parseDate(todayIso());view.setDate(1);render()};
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';$('loginBtn').disabled=true;try{await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value)}catch(err){$('loginError').textContent=firebaseErrorMessage(err)}finally{$('loginBtn').disabled=false}});
+$('logoutBtn').onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,user=>{
+  if(stopBookingsListener){stopBookingsListener();stopBookingsListener=null;}
+  currentUser=user||null;
+  if(!user){
+    firebaseReady=false;
+    $('authEmail').textContent='';$('logoutBtn').classList.add('hidden');setSyncState('Firebase: wylogowano');
+    if(!$('loginDialog').open)$('loginDialog').showModal();
+    render();
+    return;
+  }
+  $('authEmail').textContent=user.email||'';$('logoutBtn').classList.remove('hidden');
+  if($('loginDialog').open)$('loginDialog').close();
+  setSyncState('Firebase: łączenie…');
+  const localBefore=JSON.parse(localStorage.getItem('zarek_bookings')||'[]');
+  const migrationKey='zarek_firebase_migrated_v1_'+user.uid;
+  let firstSnapshot=true;
+  stopBookingsListener=onValue(bookingsRef,async snap=>{
+    const remote=snap.val()||{};
+    if(firstSnapshot && localStorage.getItem(migrationKey)!=='1'){
+      firstSnapshot=false;
+      const merged={...remote};
+      let added=0;
+      for(const b of localBefore){if(b&&b.id&&!merged[b.id]){merged[b.id]=b;added++;}}
+      localStorage.setItem(migrationKey,'1');
+      if(added>0){
+        try{setSyncState('Firebase: przenoszenie zapisanych rezerwacji…');await set(bookingsRef,merged);return}catch(err){localStorage.removeItem(migrationKey);setSyncState('Firebase: błąd migracji');alert(firebaseErrorMessage(err));return}
+      }
+    } else firstSnapshot=false;
+    bookings=Object.values(remote);
+    cacheLocal();firebaseReady=true;setSyncState('Firebase: zsynchronizowano');render();
+  },err=>{firebaseReady=false;setSyncState('Firebase: brak dostępu');alert(firebaseErrorMessage(err));});
+});
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=5').catch(()=>{});
 render();
 </script>
 </body>

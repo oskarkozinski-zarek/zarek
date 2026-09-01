@@ -1,14 +1,13 @@
 ŻAREK – Rezerwacje
-Wersja 3.0.0 – 2026-09-01
+Wersja 5.0.0 – 2026-09-01
 
-Poprawki:
-- prawidłowe wyznaczanie dzisiejszej daty według lokalnej strefy telefonu,
-- prawidłowe liczenie długości pobytu także przy zmianie czasu,
-- nowy service worker usuwa stare cache aplikacji,
-- strona główna jest pobierana z sieci w pierwszej kolejności, a cache służy jako tryb offline,
-- zachowane są dotychczasowe klucze localStorage, więc aktualizacja kodu nie kasuje rezerwacji.
+Zmiany:
+- wspólna baza Firebase Realtime Database,
+- logowanie Email/Password,
+- synchronizacja rezerwacji między telefonami,
+- bezpieczne przeniesienie istniejących rezerwacji z localStorage przy pierwszym logowaniu,
+- lokalna kopia danych nadal jest zapisywana jako cache awaryjny,
+- zachowana poprawka daty Europe/Warsaw z wersji 4.
 
-Do GitHub Pages należy wgrać zawartość folderu zarek_app do głównego katalogu repozytorium.
-
-- dzisiejsza data wymuszana według strefy Europe/Warsaw, niezależnie od UTC przeglądarki,
-- cache v4 bez przechowywania index.html.
+Firebase project: zarek-39a9b
+Database: europe-west1
