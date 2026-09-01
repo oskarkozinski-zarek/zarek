@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#173f35" />
-  <meta name="zarek-version" content="3.0.0-20260901" />
+  <meta name="zarek-version" content="4.0.0-20260901" />
   <title>Żarek – Rezerwacje</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon-192.png" type="image/png" />
@@ -84,7 +84,8 @@
 const PLN = new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',maximumFractionDigits:0});
 const monthNames=['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
 const dow=['Pon','Wt','Śr','Czw','Pt','Sob','Ndz'];
-let view = new Date(); view.setDate(1);
+function todayIso(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Warsaw',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
+let view = parseDate(todayIso()); view.setDate(1);
 let bookings = JSON.parse(localStorage.getItem('zarek_bookings')||'[]');
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem('zarek_bookings',JSON.stringify(bookings)); render();}
@@ -102,7 +103,7 @@ function render(){
   const first=(new Date(y,m,1).getDay()+6)%7; const start=new Date(y,m,1-first);
   for(let i=0;i<42;i++){
     const d=new Date(start); d.setDate(start.getDate()+i); const ds=iso(d); const cell=document.createElement('div');
-    cell.className='day'+(d.getMonth()!==m?' off':'')+(iso(new Date())===ds?' today':'');
+    cell.className='day'+(d.getMonth()!==m?' off':'')+(todayIso()===ds?' today':'');
     const n=document.createElement('div');n.className='num';n.textContent=d.getDate();cell.appendChild(n);
     bookings.filter(b=>overlapsDay(b,ds)).slice(0,3).forEach(b=>{const e=document.createElement('div');e.className=`booking ${b.status}`;e.textContent=b.guest+(b.room?` • ${b.room}`:'');e.title=e.textContent;e.onclick=(ev)=>{ev.stopPropagation();openEdit(b.id)};cell.appendChild(e)});
     const more=bookings.filter(b=>overlapsDay(b,ds)).length-3;if(more>0){const e=document.createElement('div');e.className='muted';e.style.fontSize='10px';e.textContent=`+${more} więcej`;cell.appendChild(e)}
@@ -123,8 +124,8 @@ function openNew(ds){resetForm();$('modalTitle').textContent='Dodaj rezerwację'
 function openEdit(id){const b=bookings.find(x=>x.id===id); if(!b)return; resetForm(); $('modalTitle').textContent='Edytuj rezerwację'; $('bookingId').value=b.id;$('guest').value=b.guest;$('phone').value=b.phone||'';$('room').value=b.room||'';$('dateFrom').value=b.from;$('dateTo').value=b.to;$('price').value=b.price??350;$('extra').value=b.extra??0;$('status').value=b.status;$('notes').value=b.notes||'';$('total').value=b.total??totalFor(b);$('deleteBtn').style.display='inline-block';$('dialog').showModal();}
 $('bookingForm').addEventListener('submit',e=>{e.preventDefault();const from=$('dateFrom').value,to=$('dateTo').value;if(!from||!to||to<=from){alert('Data „do” musi być późniejsza niż data „od”.');return}const id=$('bookingId').value||crypto.randomUUID();const b={id,guest:$('guest').value.trim(),phone:$('phone').value.trim(),room:$('room').value.trim(),from,to,price:Number($('price').value||0),extra:Number($('extra').value||0),status:$('status').value,total:$('total').value===''?'':Number($('total').value),notes:$('notes').value.trim()};const i=bookings.findIndex(x=>x.id===id); if(i>=0)bookings[i]=b;else bookings.push(b);$('dialog').close();save();});
 $('deleteBtn').onclick=()=>{const id=$('bookingId').value;if(id&&confirm('Usunąć tę rezerwację?')){bookings=bookings.filter(x=>x.id!==id);$('dialog').close();save()}};
-$('cancelBtn').onclick=()=>$('dialog').close();$('addBtn').onclick=()=>openNew();$('prevBtn').onclick=()=>{view.setMonth(view.getMonth()-1);render()};$('nextBtn').onclick=()=>{view.setMonth(view.getMonth()+1);render()};$('todayBtn').onclick=()=>{view=new Date();view.setDate(1);render()};
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+$('cancelBtn').onclick=()=>$('dialog').close();$('addBtn').onclick=()=>openNew();$('prevBtn').onclick=()=>{view.setMonth(view.getMonth()-1);render()};$('nextBtn').onclick=()=>{view.setMonth(view.getMonth()+1);render()};$('todayBtn').onclick=()=>{view=parseDate(todayIso());view.setDate(1);render()};
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=4').catch(()=>{});
 render();
 </script>
 </body>

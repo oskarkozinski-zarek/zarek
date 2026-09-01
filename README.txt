@@ -9,3 +9,6 @@ Poprawki:
 - zachowane są dotychczasowe klucze localStorage, więc aktualizacja kodu nie kasuje rezerwacji.
 
 Do GitHub Pages należy wgrać zawartość folderu zarek_app do głównego katalogu repozytorium.
+
+- dzisiejsza data wymuszana według strefy Europe/Warsaw, niezależnie od UTC przeglądarki,
+- cache v4 bez przechowywania index.html.
