@@ -1,16 +1,11 @@
-ŻAREK – REZERWACJE
+ŻAREK – Rezerwacje
+Wersja 3.0.0 – 2026-09-01
 
-To jest pierwsza wersja aplikacji PWA.
-Funkcje:
-- kalendarz miesięczny,
-- dodawanie i edycja rezerwacji,
-- nazwa gościa na kalendarzu,
-- statusy: potwierdzona, wstępna, zakończona, anulowana,
-- cena za dobę, opłaty dodatkowe i kwota razem,
-- podsumowanie miesięczne,
-- dane zapisywane lokalnie w przeglądarce.
+Poprawki:
+- prawidłowe wyznaczanie dzisiejszej daty według lokalnej strefy telefonu,
+- prawidłowe liczenie długości pobytu także przy zmianie czasu,
+- nowy service worker usuwa stare cache aplikacji,
+- strona główna jest pobierana z sieci w pierwszej kolejności, a cache służy jako tryb offline,
+- zachowane są dotychczasowe klucze localStorage, więc aktualizacja kodu nie kasuje rezerwacji.
 
-Najprościej uruchomić przez lokalny serwer lub hosting HTTPS.
-Po otwarciu w Chrome na Androidzie można dodać aplikację do ekranu głównego.
-
-Kolejny etap: logowanie i synchronizacja danych w chmurze (Supabase), kopie zapasowe oraz wersja APK/AAB do Google Play.
+Do GitHub Pages należy wgrać zawartość folderu zarek_app do głównego katalogu repozytorium.

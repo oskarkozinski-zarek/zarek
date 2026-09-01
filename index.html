@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#173f35" />
+  <meta name="zarek-version" content="3.0.0-20260901" />
   <title>Żarek – Rezerwacje</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon-192.png" type="image/png" />
@@ -87,9 +88,10 @@ let view = new Date(); view.setDate(1);
 let bookings = JSON.parse(localStorage.getItem('zarek_bookings')||'[]');
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem('zarek_bookings',JSON.stringify(bookings)); render();}
-function iso(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
+function iso(d){const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
+function dateSerial(s){const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)}
 function parseDate(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
-function daysBetween(a,b){return Math.max(1,Math.round((parseDate(b)-parseDate(a))/86400000))}
+function daysBetween(a,b){return Math.max(1,Math.round((dateSerial(b)-dateSerial(a))/86400000))}
 function totalFor(b){if(b.total!==''&&b.total!=null&&!Number.isNaN(Number(b.total)))return Number(b.total); return daysBetween(b.from,b.to)*Number(b.price||0)+Number(b.extra||0)}
 function overlapsDay(b,ds){return b.status!=='cancelled' && b.from<=ds && b.to>ds}
 function overlapsMonth(b,y,m){const start=`${y}-${String(m+1).padStart(2,'0')}-01`; const end=new Date(y,m+1,1); const endIso=iso(end); return b.from<endIso && b.to>start}
