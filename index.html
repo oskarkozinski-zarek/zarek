@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#173f35" />
+  <title>Żarek – Rezerwacje</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <style>
+    :root{--bg:#f5f3ec;--card:#fff;--ink:#1f2b27;--muted:#6d7b75;--green:#173f35;--green2:#2c6b5a;--gold:#d1a84b;--red:#c94848;--orange:#d98032;--line:#e7e3d9;--shadow:0 10px 30px rgba(23,63,53,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    .app{max-width:1100px;margin:auto;min-height:100vh;padding:18px 14px 90px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}
+    .brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:var(--green);display:grid;place-items:center;color:#fff;font-weight:800;font-size:20px;box-shadow:var(--shadow)}
+    h1{font-size:22px;margin:0}.sub{font-size:13px;color:var(--muted);margin-top:2px}
+    button,.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:700;cursor:pointer}.primary{background:var(--green);color:#fff}.secondary{background:#fff;color:var(--green);border:1px solid var(--line)}.danger{background:#fff0f0;color:#a52626}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0 12px;flex-wrap:wrap}.toolbar .nav{display:flex;gap:8px;align-items:center}.month{min-width:180px;text-align:center;font-weight:800;font-size:18px}
+    .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.dow{font-size:12px;color:var(--muted);font-weight:700;text-align:center;padding:6px}
+    .day{min-height:96px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;box-shadow:0 4px 14px rgba(23,63,53,.03);position:relative;overflow:hidden}.day.off{opacity:.45}.day.today{outline:2px solid var(--gold)}.num{font-size:13px;font-weight:800;margin-bottom:5px}
+    .booking{font-size:11px;line-height:1.2;padding:5px 6px;border-radius:8px;margin-top:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.confirmed{background:var(--red)}.pending{background:var(--orange)}.cancelled{background:#969696;text-decoration:line-through}.completed{background:var(--green2)}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}.stat small{color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:4px}
+    .section{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}.section h2{margin:0 0 10px;font-size:17px}
+    .list{display:grid;gap:8px}.row{display:grid;grid-template-columns:1.2fr .8fr .7fr .7fr auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px}.row .muted{font-size:12px;color:var(--muted)}
+    dialog{border:0;border-radius:18px;padding:0;max-width:620px;width:calc(100% - 24px);box-shadow:0 30px 80px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(0,0,0,.42)}.modal{padding:18px}.modal h2{margin:0 0 14px}.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}label{font-size:12px;font-weight:800;color:var(--muted)}input,select,textarea{width:100%;padding:11px;border:1px solid #d8d5ca;border-radius:10px;font:inherit;background:#fff}textarea{min-height:76px;resize:vertical}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;color:#fff}.empty{color:var(--muted);padding:8px 0}
+    @media(max-width:760px){.day{min-height:78px;padding:5px}.booking{font-size:9px}.summary{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr 1fr}.row .actions-inline{grid-column:1/-1}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar{align-items:stretch}.month{min-width:140px}.hide-sm{display:none}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><div class="logo">Ż</div><div><h1>Żarek</h1><div class="sub">Kalendarz rezerwacji</div></div></div>
+    <button class="primary" id="addBtn">+ Dodaj rezerwację</button>
+  </header>
+
+  <div class="toolbar">
+    <div class="nav"><button class="secondary" id="prevBtn">←</button><div class="month" id="monthLabel"></div><button class="secondary" id="nextBtn">→</button></div>
+    <button class="secondary" id="todayBtn">Dzisiaj</button>
+  </div>
+
+  <div class="grid" id="calendar"></div>
+
+  <div class="summary">
+    <div class="stat"><small>Rezerwacje</small><strong id="statBookings">0</strong></div>
+    <div class="stat"><small>Zajęte dni</small><strong id="statDays">0</strong></div>
+    <div class="stat"><small>Przychód</small><strong id="statRevenue">0 zł</strong></div>
+    <div class="stat"><small>Potwierdzone</small><strong id="statConfirmed">0</strong></div>
+  </div>
+
+  <div class="section">
+    <h2>Rezerwacje w tym miesiącu</h2>
+    <div class="list" id="bookingList"></div>
+  </div>
+</div>
+
+<dialog id="dialog">
+  <form method="dialog" class="modal" id="bookingForm">
+    <h2 id="modalTitle">Dodaj rezerwację</h2>
+    <input type="hidden" id="bookingId" />
+    <div class="form">
+      <div class="field full"><label>Gość</label><input id="guest" required placeholder="np. Kowalski" /></div>
+      <div class="field"><label>Telefon</label><input id="phone" inputmode="tel" placeholder="np. 500 600 700" /></div>
+      <div class="field"><label>Apartament / pokój</label><input id="room" placeholder="np. Apartament 1" /></div>
+      <div class="field"><label>Data od</label><input id="dateFrom" type="date" required /></div>
+      <div class="field"><label>Data do</label><input id="dateTo" type="date" required /></div>
+      <div class="field"><label>Cena za dobę</label><input id="price" type="number" min="0" step="1" value="350" /></div>
+      <div class="field"><label>Dodatkowe opłaty</label><input id="extra" type="number" min="0" step="1" value="0" /></div>
+      <div class="field"><label>Status</label><select id="status"><option value="confirmed">Potwierdzona</option><option value="pending">Wstępna</option><option value="completed">Zakończona</option><option value="cancelled">Anulowana</option></select></div>
+      <div class="field"><label>Kwota razem</label><input id="total" type="number" min="0" step="1" /></div>
+      <div class="field full"><label>Uwagi</label><textarea id="notes" placeholder="Dodatkowe informacje"></textarea></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="danger" id="deleteBtn" style="display:none;margin-right:auto">Usuń</button>
+      <button type="button" class="secondary" id="cancelBtn">Anuluj</button>
+      <button type="submit" class="primary">Zapisz</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const PLN = new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',maximumFractionDigits:0});
+const monthNames=['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
+const dow=['Pon','Wt','Śr','Czw','Pt','Sob','Ndz'];
+let view = new Date(); view.setDate(1);
+let bookings = JSON.parse(localStorage.getItem('zarek_bookings')||'[]');
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem('zarek_bookings',JSON.stringify(bookings)); render();}
+function iso(d){return d.toISOString().slice(0,10)}
+function parseDate(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function daysBetween(a,b){return Math.max(1,Math.round((parseDate(b)-parseDate(a))/86400000))}
+function totalFor(b){if(b.total!==''&&b.total!=null&&!Number.isNaN(Number(b.total)))return Number(b.total); return daysBetween(b.from,b.to)*Number(b.price||0)+Number(b.extra||0)}
+function overlapsDay(b,ds){return b.status!=='cancelled' && b.from<=ds && b.to>ds}
+function overlapsMonth(b,y,m){const start=`${y}-${String(m+1).padStart(2,'0')}-01`; const end=new Date(y,m+1,1); const endIso=iso(end); return b.from<endIso && b.to>start}
+function statusText(s){return {confirmed:'Potwierdzona',pending:'Wstępna',completed:'Zakończona',cancelled:'Anulowana'}[s]||s}
+function render(){
+  const y=view.getFullYear(), m=view.getMonth(); $('monthLabel').textContent=`${monthNames[m][0].toUpperCase()+monthNames[m].slice(1)} ${y}`;
+  const cal=$('calendar'); cal.innerHTML=''; dow.forEach(x=>{const e=document.createElement('div');e.className='dow';e.textContent=x;cal.appendChild(e)});
+  const first=(new Date(y,m,1).getDay()+6)%7; const start=new Date(y,m,1-first);
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i); const ds=iso(d); const cell=document.createElement('div');
+    cell.className='day'+(d.getMonth()!==m?' off':'')+(iso(new Date())===ds?' today':'');
+    const n=document.createElement('div');n.className='num';n.textContent=d.getDate();cell.appendChild(n);
+    bookings.filter(b=>overlapsDay(b,ds)).slice(0,3).forEach(b=>{const e=document.createElement('div');e.className=`booking ${b.status}`;e.textContent=b.guest+(b.room?` • ${b.room}`:'');e.title=e.textContent;e.onclick=(ev)=>{ev.stopPropagation();openEdit(b.id)};cell.appendChild(e)});
+    const more=bookings.filter(b=>overlapsDay(b,ds)).length-3;if(more>0){const e=document.createElement('div');e.className='muted';e.style.fontSize='10px';e.textContent=`+${more} więcej`;cell.appendChild(e)}
+    cell.onclick=()=>openNew(ds); cal.appendChild(cell);
+  }
+  const inMonth=bookings.filter(b=>overlapsMonth(b,y,m));
+  $('statBookings').textContent=inMonth.filter(b=>b.status!=='cancelled').length;
+  $('statConfirmed').textContent=inMonth.filter(b=>b.status==='confirmed').length;
+  $('statRevenue').textContent=PLN.format(inMonth.filter(b=>b.status!=='cancelled').reduce((s,b)=>s+totalFor(b),0));
+  let occupied=0; const monthStart=new Date(y,m,1), monthEnd=new Date(y,m+1,1); for(let d=new Date(monthStart);d<monthEnd;d.setDate(d.getDate()+1)){if(bookings.some(b=>overlapsDay(b,iso(d))))occupied++} $('statDays').textContent=occupied;
+  const list=$('bookingList'); list.innerHTML=''; const sorted=[...inMonth].sort((a,b)=>a.from.localeCompare(b.from)); if(!sorted.length){list.innerHTML='<div class="empty">Brak rezerwacji w tym miesiącu.</div>'} else sorted.forEach(b=>{
+    const r=document.createElement('div');r.className='row';r.innerHTML=`<div><strong>${escapeHtml(b.guest)}</strong><div class="muted">${escapeHtml(b.room||'Bez nazwy')}</div></div><div>${b.from}<div class="muted">do ${b.to}</div></div><div><span class="badge ${b.status}">${statusText(b.status)}</span></div><div><strong>${PLN.format(totalFor(b))}</strong></div><div class="actions-inline"><button class="secondary">Edytuj</button></div>`; r.querySelector('button').onclick=()=>openEdit(b.id); list.appendChild(r)
+  })
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function resetForm(){['bookingId','guest','phone','room','dateFrom','dateTo','notes','total'].forEach(id=>$(id).value='');$('price').value=350;$('extra').value=0;$('status').value='confirmed';$('deleteBtn').style.display='none'}
+function openNew(ds){resetForm();$('modalTitle').textContent='Dodaj rezerwację'; if(ds){$('dateFrom').value=ds; const d=parseDate(ds);d.setDate(d.getDate()+1);$('dateTo').value=iso(d)} $('dialog').showModal();}
+function openEdit(id){const b=bookings.find(x=>x.id===id); if(!b)return; resetForm(); $('modalTitle').textContent='Edytuj rezerwację'; $('bookingId').value=b.id;$('guest').value=b.guest;$('phone').value=b.phone||'';$('room').value=b.room||'';$('dateFrom').value=b.from;$('dateTo').value=b.to;$('price').value=b.price??350;$('extra').value=b.extra??0;$('status').value=b.status;$('notes').value=b.notes||'';$('total').value=b.total??totalFor(b);$('deleteBtn').style.display='inline-block';$('dialog').showModal();}
+$('bookingForm').addEventListener('submit',e=>{e.preventDefault();const from=$('dateFrom').value,to=$('dateTo').value;if(!from||!to||to<=from){alert('Data „do” musi być późniejsza niż data „od”.');return}const id=$('bookingId').value||crypto.randomUUID();const b={id,guest:$('guest').value.trim(),phone:$('phone').value.trim(),room:$('room').value.trim(),from,to,price:Number($('price').value||0),extra:Number($('extra').value||0),status:$('status').value,total:$('total').value===''?'':Number($('total').value),notes:$('notes').value.trim()};const i=bookings.findIndex(x=>x.id===id); if(i>=0)bookings[i]=b;else bookings.push(b);$('dialog').close();save();});
+$('deleteBtn').onclick=()=>{const id=$('bookingId').value;if(id&&confirm('Usunąć tę rezerwację?')){bookings=bookings.filter(x=>x.id!==id);$('dialog').close();save()}};
+$('cancelBtn').onclick=()=>$('dialog').close();$('addBtn').onclick=()=>openNew();$('prevBtn').onclick=()=>{view.setMonth(view.getMonth()-1);render()};$('nextBtn').onclick=()=>{view.setMonth(view.getMonth()+1);render()};$('todayBtn').onclick=()=>{view=new Date();view.setDate(1);render()};
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+render();
+</script>
+</body>
+</html>
