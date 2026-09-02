@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#173f35" />
-  <meta name="zarek-version" content="7.0.0-20260901" />
+  <meta name="zarek-version" content="11.0.0-20260902" />
   <title>Żarek – Rezerwacje</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon-192.png" type="image/png" />
@@ -34,7 +34,7 @@
 <body>
 <div class="app">
   <header>
-    <div class="brand"><div class="logo">Ż</div><div><h1>Żarek</h1><div class="sub">Kalendarz rezerwacji</div></div></div>
+    <div class="brand"><div class="logo">Ż</div><div><h1>Żarek</h1><div class="sub">Kalendarz rezerwacji · v11</div></div></div>
     <div class="auth-actions"><span class="auth-email" id="authEmail"></span><button class="secondary hidden" id="logoutBtn">Wyloguj</button><button class="primary" id="addBtn">+ Dodaj rezerwację</button></div>
   </header>
 
@@ -176,6 +176,24 @@ function dateSerial(s){const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,
 function parseDate(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
 function daysBetween(a,b){return Math.max(1,Math.round((dateSerial(b)-dateSerial(a))/86400000))}
 function totalFor(b){if(b.total!==''&&b.total!=null&&!Number.isNaN(Number(b.total)))return Number(b.total); return daysBetween(b.from,b.to)*Number(b.price||0)+Number(b.extra||0)}
+function checkoutParts(b){
+  const m=String(b?.to||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m?{year:Number(m[1]),month:Number(m[2])-1,day:Number(m[3])}:null;
+}
+function revenueForMonth(y,m){
+  return bookings.filter(b=>{
+    if(b.status==='cancelled')return false;
+    const p=checkoutParts(b);
+    return p&&p.year===y&&p.month===m;
+  }).reduce((sum,b)=>sum+totalFor(b),0);
+}
+function revenueForYear(y){
+  return bookings.filter(b=>{
+    if(b.status==='cancelled')return false;
+    const p=checkoutParts(b);
+    return p&&p.year===y;
+  }).reduce((sum,b)=>sum+totalFor(b),0);
+}
 function overlapsDay(b,ds){return b.status!=='cancelled' && b.from<=ds && b.to>ds}
 function overlapsMonth(b,y,m){const start=`${y}-${String(m+1).padStart(2,'0')}-01`; const end=new Date(y,m+1,1); const endIso=iso(end); return b.from<endIso && b.to>start}
 function statusText(s){return {confirmed:'Potwierdzona',pending:'Wstępna',completed:'Zakończona',cancelled:'Anulowana'}[s]||s}
@@ -215,7 +233,7 @@ function renderYear(){
   const inYear=bookings.filter(b=>b.from<`${y+1}-01-01`&&b.to>`${y}-01-01`);
   $('statBookings').textContent=inYear.filter(b=>b.status!=='cancelled').length;
   $('statConfirmed').textContent=inYear.filter(b=>b.status==='confirmed').length;
-  const yearRevenue=bookings.filter(b=>b.status!=='cancelled' && String(b.to||'').startsWith(`${y}-`)).reduce((sum,b)=>sum+totalFor(b),0);
+  const yearRevenue=revenueForYear(y);
   $('statRevenueLabel').textContent='Przychód roczny';
   $('statRevenue').textContent=PLN.format(yearRevenue);
   $('statTaxLabel').textContent='Podatek 8,5% roku';
@@ -240,7 +258,7 @@ function render(){
   const inMonth=bookings.filter(b=>overlapsMonth(b,y,m));
   $('statBookings').textContent=inMonth.filter(b=>b.status!=='cancelled').length;
   $('statConfirmed').textContent=inMonth.filter(b=>b.status==='confirmed').length;
-  const exitMonth=`${y}-${String(m+1).padStart(2,'0')}-`; const monthRevenue=bookings.filter(b=>b.status!=='cancelled' && String(b.to||'').startsWith(exitMonth)).reduce((s,b)=>s+totalFor(b),0);
+  const monthRevenue=revenueForMonth(y,m);
   $('statRevenueLabel').textContent='Przychód miesiąca';
   $('statRevenue').textContent=PLN.format(monthRevenue);
   $('statTaxLabel').textContent='Podatek 8,5% miesiąca';
@@ -294,7 +312,7 @@ onAuthStateChanged(auth,user=>{
   },err=>{firebaseReady=false;setSyncState('Firebase: brak dostępu');alert(firebaseErrorMessage(err));});
 });
 
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=10').catch(()=>{});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=11').catch(()=>{});
 render();
 </script>
 </body>
