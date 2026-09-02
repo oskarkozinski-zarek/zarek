@@ -215,7 +215,7 @@ function renderYear(){
   const inYear=bookings.filter(b=>b.from<`${y+1}-01-01`&&b.to>`${y}-01-01`);
   $('statBookings').textContent=inYear.filter(b=>b.status!=='cancelled').length;
   $('statConfirmed').textContent=inYear.filter(b=>b.status==='confirmed').length;
-  const yearRevenue=inYear.filter(b=>b.status!=='cancelled').reduce((sum,b)=>sum+totalFor(b),0);
+  const yearRevenue=bookings.filter(b=>b.status!=='cancelled' && String(b.to||'').startsWith(`${y}-`)).reduce((sum,b)=>sum+totalFor(b),0);
   $('statRevenueLabel').textContent='Przychód roczny';
   $('statRevenue').textContent=PLN.format(yearRevenue);
   $('statTaxLabel').textContent='Podatek 8,5% roku';
@@ -240,7 +240,7 @@ function render(){
   const inMonth=bookings.filter(b=>overlapsMonth(b,y,m));
   $('statBookings').textContent=inMonth.filter(b=>b.status!=='cancelled').length;
   $('statConfirmed').textContent=inMonth.filter(b=>b.status==='confirmed').length;
-  const monthRevenue=inMonth.filter(b=>b.status!=='cancelled').reduce((s,b)=>s+totalFor(b),0);
+  const exitMonth=`${y}-${String(m+1).padStart(2,'0')}-`; const monthRevenue=bookings.filter(b=>b.status!=='cancelled' && String(b.to||'').startsWith(exitMonth)).reduce((s,b)=>s+totalFor(b),0);
   $('statRevenueLabel').textContent='Przychód miesiąca';
   $('statRevenue').textContent=PLN.format(monthRevenue);
   $('statTaxLabel').textContent='Podatek 8,5% miesiąca';
@@ -294,7 +294,7 @@ onAuthStateChanged(auth,user=>{
   },err=>{firebaseReady=false;setSyncState('Firebase: brak dostępu');alert(firebaseErrorMessage(err));});
 });
 
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=9').catch(()=>{});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=10').catch(()=>{});
 render();
 </script>
 </body>
